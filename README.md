@@ -27,7 +27,7 @@ To test the prototype or review the source code in Godot:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com
+   git clone https://github.com/ZeusOneRG/Battleship_game/
    ```
 2. Download and install **Godot Engine** (version 4.7.1 recommended).
-3. Open Godot, click **Import**, and locate the `project.godot` file inside the cloned folder.<img width="576" height="324" alt="Screenshot_5" src="https://github.com/user-attachments/assets/d28d904d-3c63-4e76-99d1-7f97040c67b9" />
+3. Open Godot, click **Import**, and locate the `project.godot` file inside the cloned folder.
