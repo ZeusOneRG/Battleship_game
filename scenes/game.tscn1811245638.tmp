@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://bhcsqtu5o6emk"]
+
+[ext_resource type="Script" uid="uid://cfdokgy1spc0r" path="res://scripts/game.gd" id="1_uwrxv"]
+[ext_resource type="Texture2D" uid="uid://dvyvvflbj2nj0" path="res://assets/background.jpg" id="2_yqjtg"]
+[ext_resource type="Script" uid="uid://dyl6oxg8xuhfh" path="res://scripts/dashboard.gd" id="4_lbhrr"]
+
+[node name="Game" type="Node2D" unique_id=30196805]
+script = ExtResource("1_uwrxv")
+
+[node name="Background" type="TextureRect" parent="." unique_id=905336546]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 2560.0
+offset_bottom = 1440.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.4615386, 0.48000002)
+texture = ExtResource("2_yqjtg")
+stretch_mode = 3
+
+[node name="Status" type="Label" parent="Background" unique_id=991922514]
+layout_mode = 0
+offset_left = 1098.4996
+offset_top = 52.083332
+offset_right = 1198.4996
+offset_bottom = 75.08333
+size_flags_vertical = 0
+horizontal_alignment = 1
+uppercase = true
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=972163962]
+offset_right = 100.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1831163034]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Dashboard" type="GridContainer" parent="MarginContainer/HBoxContainer" unique_id=1298948944]
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 10
+script = ExtResource("4_lbhrr")
+
+[node name="Dashboard2" type="GridContainer" parent="MarginContainer/HBoxContainer" unique_id=32272555]
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 10
+script = ExtResource("4_lbhrr")
