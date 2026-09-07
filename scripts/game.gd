@@ -7,6 +7,9 @@ enum GameState { PLACEMENT, COMBAT, GAME_OVER }
 @onready var enemy_dashboard: Dashboard = $MarginContainer/HBoxContainer/Dashboard2
 @onready var status_label: Label = $Background/Status
 
+var preview_cells: Array[Vector2i] = []
+var last_hovered_coord: Vector2i = Vector2i(-1, -1)
+
 var current_state: GameState = GameState.PLACEMENT
 var ship_sizes: Array[int] = [5, 4, 3, 2]
 var ship_names: Array[String] = ["Carrier", "Battleship", "Cruiser", "Submarine"]
@@ -59,6 +62,10 @@ func setup_grid_buttons(grid: Dashboard, click_callback: Callable) -> void:
 		var coord = Vector2i(i % 10, i / 10)
 		btn.pressed.connect(func(): click_callback.call(coord))
 		
+		if grid == player_dashboard:
+			btn.mouse_entered.connect(func(): _on_hover(coord, true))
+			btn.mouse_exited.connect(func(): _on_hover(coord, false))
+		
 		grid.add_child(btn)
 		grid.register_grid_button(coord, btn)
 
@@ -71,9 +78,12 @@ func reset_game() -> void:
 	setup_grid_buttons(enemy_dashboard, _on_enemy_grid_clicked)
 
 func _input(event: InputEvent) -> void:
-	# It is highly recommended to configure "rotate_ship" in Project -> Input Map
 	if event.is_action_pressed("ui_focus_next") or (event is InputEventKey and event.pressed and event.keycode == KEY_R):
 		is_horizontal = not is_horizontal
+		
+		# Forzar el repintado de la rotación si el cursor está sobre la grilla
+		if last_hovered_coord != Vector2i(-1, -1):
+			_on_hover(last_hovered_coord, true)
 
 func _on_player_grid_clicked(coord: Vector2i) -> void:
 	if current_state != GameState.PLACEMENT: 
@@ -167,3 +177,40 @@ func process_enemy_turn() -> void:
 	if not player_dashboard.has_active_ships():
 		status_label.text = "Defeat. Game over."
 		current_state = GameState.GAME_OVER
+		
+func _on_hover(coord: Vector2i, is_entering: bool) -> void:
+	if current_state != GameState.PLACEMENT:
+		return
+		
+	last_hovered_coord = coord if is_entering else Vector2i(-1, -1)
+
+	# 1. Limpiar el rastro de la previsualización anterior
+	for c in preview_cells:
+		if player_dashboard.button_matrix.has(c) and not player_dashboard.ships.has(c):
+			var btn: TextureButton = player_dashboard.button_matrix[c]
+			btn.modulate = Color.WHITE
+
+	preview_cells.clear()
+
+	if not is_entering:
+		return
+
+	# 2. Calcular las nuevas celdas a previsualizar
+	var size: int = ship_sizes[current_ship_idx]
+	var is_valid: bool = true
+
+	for i in range(size):
+		var c: Vector2i = Vector2i(coord.x + i, coord.y) if is_horizontal else Vector2i(coord.x, coord.y + i)
+		preview_cells.append(c)
+		
+		# Validar colisiones con los límites del tablero u otras naves
+		if c.x >= 10 or c.y >= 10 or player_dashboard.ships.has(c):
+			is_valid = false
+
+	# 3. Aplicar color: Verde translúcido si cabe, Rojo si no
+	var preview_color: Color = Color(0.0, 1.0, 0.0, 0.5) if is_valid else Color(1.0, 0.0, 0.0, 0.5)
+
+	for c in preview_cells:
+		if player_dashboard.button_matrix.has(c) and not player_dashboard.ships.has(c):
+			var btn: TextureButton = player_dashboard.button_matrix[c]
+			btn.modulate = preview_color
